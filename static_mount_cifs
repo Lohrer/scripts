@@ -59,7 +59,7 @@ sudo cp /etc/fstab /etc/fstab.bak
 sudo sed -i "/\/\/$server\/$share/d" /etc/fstab
 
 # Add a new entry for the share
-echo "//$server/$share /home/$USER/mnt/$server/$share cifs credentials=/home/$USER/$creds,uid=$USER,gid=$USER,iocharset=utf8 0 0" | sudo tee -a /etc/fstab >> /dev/null
+echo "//$server/$share /home/$USER/mnt/$server/$share cifs credentials=/home/$USER/$creds,uid=$USER,gid=$USER,iocharset=utf8,x-systemd.automount 0 0" | sudo tee -a /etc/fstab >> /dev/null
 
 echo "Credentials are stored in ~/$creds"
 echo "Run 'sudo mount -a' to mount immediately"
