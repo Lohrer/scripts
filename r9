@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+# R9 common functions
+
+R9_IP='10.0.0.90'
+R9_RELAY_IP='10.0.0.4'
+RHK_DB_IP='192.168.254.4'
+VPN_CONFIG_DIR="$HOME/vpn"
+
+r9on()
+{
+  command -v curl >/dev/null 2>&1 || { echo >&2 "curl required but not installed."; exit 1; }
+  curl -s http://$R9_RELAY_IP/on -o /dev/null
+}
+
+r9off()
+{
+  command -v curl >/dev/null 2>&1 || { echo >&2 "curl required but not installed."; exit 1; }
+  curl -s http://$R9_RELAY_IP/off -o /dev/null
+}
+
+r9reset()
+{
+  r9off
+  sleep 4
+  r9on
+}
+
+r9ffe()
+{
+  command -v ffe >/dev/null 2>&1 || { echo >&2 "ffe required but not installed."; exit 1; }
+  ffe -a $R9_IP -p B -b -s 2000
+}
+
+r9db()
+{
+  command -v mysql >/dev/null 2>&1 || { echo >&2 "mysql required but not installed."; exit 1; }
+  mysql -u mflohrer -p -h $RHK_DB_IP test_reports
+  # Password hint: bugzilla
+}
+
+r9vpn()
+{
+  cd $VPN_CONFIG_DIR
+  sudo openvpn --config rhk.ovpn
+}
+
+case "$1" in
+  (on)
+    r9on
+    exit 0
+    ;;
+  (off)
+    r9off
+    exit 0
+    ;;
+  (reset)
+    r9reset
+    exit 0
+    ;;
+  (ffe)
+    r9ffe
+    exit 0
+    ;;
+  (db)
+    r9db
+    exit 0
+    ;;
+  (vpn)
+    r9vpn
+    exit 0
+    ;;
+  (*)
+    echo "Usage: $0 {on|off|reset|ffe|db|vpn}"
+    exit 1
+    ;;
+esac
